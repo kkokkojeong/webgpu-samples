@@ -9,7 +9,11 @@ type Props = {
   slug: string;
 };
 
-export const pages = {
+type PageComponentType = {
+  [key: string]: React.ComponentType;
+};
+
+export const pages: PageComponentType = {
   helloTriangle: dynamic(() => import('../../sample/helloTriangle/main')),
   helloTriangleMSAA: dynamic(
     () => import('../../sample/helloTriangleMSAA/main')
@@ -20,12 +24,16 @@ export const pages = {
   texturedCube: dynamic(() => import('../../sample/texturedCube/main')),
   instancedCube: dynamic(() => import('../../sample/instancedCube/main')),
   fractalCube: dynamic(() => import('../../sample/fractalCube/main')),
+  cameras: dynamic(() => import('../../sample/cameras/main')),
   cubemap: dynamic(() => import('../../sample/cubemap/main')),
   computeBoids: dynamic(() => import('../../sample/computeBoids/main')),
   animometer: dynamic(() => import('../../sample/animometer/main')),
   videoUploading: dynamic(() => import('../../sample/videoUploading/main')),
   videoUploadingWebCodecs: dynamic(
     () => import('../../sample/videoUploadingWebCodecs/main')
+  ),
+  samplerParameters: dynamic(
+    () => import('../../sample/samplerParameters/main')
   ),
   imageBlur: dynamic(() => import('../../sample/imageBlur/main')),
   shadowMapping: dynamic(() => import('../../sample/shadowMapping/main')),
@@ -36,6 +44,11 @@ export const pages = {
   particles: dynamic(() => import('../../sample/particles/main')),
   cornell: dynamic(() => import('../../sample/cornell/main')),
   gameOfLife: dynamic(() => import('../../sample/gameOfLife/main')),
+  renderBundles: dynamic(() => import('../../sample/renderBundles/main')),
+  worker: dynamic(() => import('../../sample/worker/main')),
+  'A-buffer': dynamic(() => import('../../sample/a-buffer/main')),
+  bitonicSort: dynamic(() => import('../../sample/bitonicSort/main')),
+  normalMap: dynamic(() => import('../../sample/normalMap/main')),
 };
 
 function Page({ slug }: Props): JSX.Element {
@@ -55,9 +68,13 @@ export const getStaticPaths: GetStaticPaths<PathParams> = async () => {
 export const getStaticProps: GetStaticProps<Props, PathParams> = async ({
   params,
 }) => {
+  if (!params) {
+    return { notFound: true };
+  }
+
   return {
     props: {
-      ...params,
+      slug: params.slug,
     },
   };
 };

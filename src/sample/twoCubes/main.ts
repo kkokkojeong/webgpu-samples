@@ -19,7 +19,7 @@ const init: SampleInit = async ({ canvas, pageState }) => {
   if (!pageState.active) return;
   const context = canvas.getContext('webgpu') as GPUCanvasContext;
 
-  const devicePixelRatio = window.devicePixelRatio || 1;
+  const devicePixelRatio = window.devicePixelRatio;
   canvas.width = canvas.clientWidth * devicePixelRatio;
   canvas.height = canvas.clientHeight * devicePixelRatio;
   const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -236,10 +236,10 @@ const init: SampleInit = async ({ canvas, pageState }) => {
     // Bind the bind group (with the transformation matrix) for
     // each cube, and draw.
     passEncoder.setBindGroup(0, uniformBindGroup1);
-    passEncoder.draw(cubeVertexCount, 1, 0, 0);
+    passEncoder.draw(cubeVertexCount);
 
     passEncoder.setBindGroup(0, uniformBindGroup2);
-    passEncoder.draw(cubeVertexCount, 1, 0, 0);
+    passEncoder.draw(cubeVertexCount);
 
     passEncoder.end();
     device.queue.submit([commandEncoder.finish()]);

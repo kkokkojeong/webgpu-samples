@@ -14,7 +14,7 @@ const init: SampleInit = async ({ canvas, pageState, gui }) => {
   if (!pageState.active) return;
   const context = canvas.getContext('webgpu') as GPUCanvasContext;
 
-  const devicePixelRatio = window.devicePixelRatio || 1;
+  const devicePixelRatio = window.devicePixelRatio;
   canvas.width = canvas.clientWidth * devicePixelRatio;
   canvas.height = canvas.clientHeight * devicePixelRatio;
   const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -64,13 +64,8 @@ const init: SampleInit = async ({ canvas, pageState, gui }) => {
     minFilter: 'linear',
   });
 
-  const img = document.createElement('img');
-  img.src = new URL(
-    '../../../assets/img/Di-3d.png',
-    import.meta.url
-  ).toString();
-  await img.decode();
-  const imageBitmap = await createImageBitmap(img);
+  const response = await fetch('../assets/img/Di-3d.png');
+  const imageBitmap = await createImageBitmap(await response.blob());
 
   const [srcWidth, srcHeight] = [imageBitmap.width, imageBitmap.height];
   const cubeTexture = device.createTexture({
@@ -288,7 +283,7 @@ const init: SampleInit = async ({ canvas, pageState, gui }) => {
 
     passEncoder.setPipeline(fullscreenQuadPipeline);
     passEncoder.setBindGroup(0, showResultBindGroup);
-    passEncoder.draw(6, 1, 0, 0);
+    passEncoder.draw(6);
     passEncoder.end();
     device.queue.submit([commandEncoder.finish()]);
 

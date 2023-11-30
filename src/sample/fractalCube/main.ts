@@ -19,7 +19,7 @@ const init: SampleInit = async ({ canvas, pageState }) => {
   if (!pageState.active) return;
   const context = canvas.getContext('webgpu') as GPUCanvasContext;
 
-  const devicePixelRatio = window.devicePixelRatio || 1;
+  const devicePixelRatio = window.devicePixelRatio;
   canvas.width = canvas.clientWidth * devicePixelRatio;
   canvas.height = canvas.clientHeight * devicePixelRatio;
   const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -211,7 +211,7 @@ const init: SampleInit = async ({ canvas, pageState }) => {
     passEncoder.setPipeline(pipeline);
     passEncoder.setBindGroup(0, uniformBindGroup);
     passEncoder.setVertexBuffer(0, verticesBuffer);
-    passEncoder.draw(cubeVertexCount, 1, 0, 0);
+    passEncoder.draw(cubeVertexCount);
     passEncoder.end();
 
     // Copy the rendering results from the swapchain into |cubeTexture|.

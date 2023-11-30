@@ -19,7 +19,7 @@ const init: SampleInit = async ({ canvas, pageState }) => {
   if (!pageState.active) return;
   const context = canvas.getContext('webgpu') as GPUCanvasContext;
 
-  const devicePixelRatio = window.devicePixelRatio || 1;
+  const devicePixelRatio = window.devicePixelRatio;
   canvas.width = canvas.clientWidth * devicePixelRatio;
   canvas.height = canvas.clientHeight * devicePixelRatio;
   const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -107,35 +107,16 @@ const init: SampleInit = async ({ canvas, pageState }) => {
   {
     // The order of the array layers is [+X, -X, +Y, -Y, +Z, -Z]
     const imgSrcs = [
-      new URL(
-        `../../../assets/img/cubemap/posx.jpg`,
-        import.meta.url
-      ).toString(),
-      new URL(
-        `../../../assets/img/cubemap/negx.jpg`,
-        import.meta.url
-      ).toString(),
-      new URL(
-        `../../../assets/img/cubemap/posy.jpg`,
-        import.meta.url
-      ).toString(),
-      new URL(
-        `../../../assets/img/cubemap/negy.jpg`,
-        import.meta.url
-      ).toString(),
-      new URL(
-        `../../../assets/img/cubemap/posz.jpg`,
-        import.meta.url
-      ).toString(),
-      new URL(
-        `../../../assets/img/cubemap/negz.jpg`,
-        import.meta.url
-      ).toString(),
+      '../assets/img/cubemap/posx.jpg',
+      '../assets/img/cubemap/negx.jpg',
+      '../assets/img/cubemap/posy.jpg',
+      '../assets/img/cubemap/negy.jpg',
+      '../assets/img/cubemap/posz.jpg',
+      '../assets/img/cubemap/negz.jpg',
     ];
-    const promises = imgSrcs.map((src) => {
-      const img = document.createElement('img');
-      img.src = src;
-      return img.decode().then(() => createImageBitmap(img));
+    const promises = imgSrcs.map(async (src) => {
+      const response = await fetch(src);
+      return createImageBitmap(await response.blob());
     });
     const imageBitmaps = await Promise.all(promises);
 
@@ -265,7 +246,7 @@ const init: SampleInit = async ({ canvas, pageState }) => {
     passEncoder.setPipeline(pipeline);
     passEncoder.setVertexBuffer(0, verticesBuffer);
     passEncoder.setBindGroup(0, uniformBindGroup);
-    passEncoder.draw(cubeVertexCount, 1, 0, 0);
+    passEncoder.draw(cubeVertexCount);
     passEncoder.end();
     device.queue.submit([commandEncoder.finish()]);
 

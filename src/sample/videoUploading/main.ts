@@ -3,16 +3,13 @@ import { makeSample, SampleInit } from '../../components/SampleLayout';
 import fullscreenTexturedQuadWGSL from '../../shaders/fullscreenTexturedQuad.wgsl';
 import sampleExternalTextureWGSL from '../../shaders/sampleExternalTexture.frag.wgsl';
 
-const init: SampleInit = async ({ canvas, pageState }) => {
+const init: SampleInit = async ({ canvas, pageState, gui }) => {
   // Set video element
   const video = document.createElement('video');
   video.loop = true;
   video.autoplay = true;
   video.muted = true;
-  video.src = new URL(
-    '../../../assets/video/pano.webm',
-    import.meta.url
-  ).toString();
+  video.src = '../assets/video/pano.webm';
   await video.play();
 
   const adapter = await navigator.gpu.requestAdapter();
@@ -21,7 +18,7 @@ const init: SampleInit = async ({ canvas, pageState }) => {
   if (!pageState.active) return;
 
   const context = canvas.getContext('webgpu') as GPUCanvasContext;
-  const devicePixelRatio = window.devicePixelRatio || 1;
+  const devicePixelRatio = window.devicePixelRatio;
   canvas.width = canvas.clientWidth * devicePixelRatio;
   canvas.height = canvas.clientHeight * devicePixelRatio;
   const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -61,6 +58,15 @@ const init: SampleInit = async ({ canvas, pageState }) => {
     minFilter: 'linear',
   });
 
+  const settings = {
+    requestFrame: 'requestAnimationFrame',
+  };
+
+  gui.add(settings, 'requestFrame', [
+    'requestAnimationFrame',
+    'requestVideoFrameCallback',
+  ]);
+
   function frame() {
     // Sample is no longer the active page.
     if (!pageState.active) return;
@@ -98,18 +104,18 @@ const init: SampleInit = async ({ canvas, pageState }) => {
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     passEncoder.setPipeline(pipeline);
     passEncoder.setBindGroup(0, uniformBindGroup);
-    passEncoder.draw(6, 1, 0, 0);
+    passEncoder.draw(6);
     passEncoder.end();
     device.queue.submit([commandEncoder.finish()]);
 
-    if ('requestVideoFrameCallback' in video) {
+    if (settings.requestFrame == 'requestVideoFrameCallback') {
       video.requestVideoFrameCallback(frame);
     } else {
       requestAnimationFrame(frame);
     }
   }
 
-  if ('requestVideoFrameCallback' in video) {
+  if (settings.requestFrame == 'requestVideoFrameCallback') {
     video.requestVideoFrameCallback(frame);
   } else {
     requestAnimationFrame(frame);
@@ -120,6 +126,7 @@ const VideoUploading: () => JSX.Element = () =>
   makeSample({
     name: 'Video Uploading',
     description: 'This example shows how to upload video frame to WebGPU.',
+    gui: true,
     init,
     sources: [
       {

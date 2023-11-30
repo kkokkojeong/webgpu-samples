@@ -22,7 +22,7 @@ const init: SampleInit = async ({ canvas, pageState, gui }) => {
   if (!pageState.active) return;
   const context = canvas.getContext('webgpu') as GPUCanvasContext;
 
-  const devicePixelRatio = window.devicePixelRatio || 1;
+  const devicePixelRatio = window.devicePixelRatio;
   canvas.width = canvas.clientWidth * devicePixelRatio;
   canvas.height = canvas.clientHeight * devicePixelRatio;
   const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -185,13 +185,8 @@ const init: SampleInit = async ({ canvas, pageState, gui }) => {
   let textureHeight = 1;
   let numMipLevels = 1;
   {
-    const img = document.createElement('img');
-    img.src = new URL(
-      '../../../assets/img/webgpu.png',
-      import.meta.url
-    ).toString();
-    await img.decode();
-    const imageBitmap = await createImageBitmap(img);
+    const response = await fetch('../assets/img/webgpu.png');
+    const imageBitmap = await createImageBitmap(await response.blob());
 
     // Calculate number of mip levels required to generate the probability map
     while (

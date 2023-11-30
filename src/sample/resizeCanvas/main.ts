@@ -1,4 +1,4 @@
-import { makeSample, SampleInit } from '../../components/SampleLayout';
+import { assert, makeSample, SampleInit } from '../../components/SampleLayout';
 
 import triangleVertWGSL from '../../shaders/triangle.vert.wgsl';
 import redFragWGSL from '../../shaders/red.frag.wgsl';
@@ -7,6 +7,7 @@ import styles from './animatedCanvasSize.module.css';
 
 const init: SampleInit = async ({ canvas, pageState }) => {
   const adapter = await navigator.gpu.requestAdapter();
+  assert(adapter, 'requestAdapter returned null');
   const device = await adapter.requestDevice();
 
   if (!pageState.active) return;
@@ -14,7 +15,7 @@ const init: SampleInit = async ({ canvas, pageState }) => {
 
   const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
 
-  const devicePixelRatio = window.devicePixelRatio || 1;
+  const devicePixelRatio = window.devicePixelRatio;
   canvas.width = canvas.clientWidth * devicePixelRatio;
   canvas.height = canvas.clientHeight * devicePixelRatio;
 
@@ -110,7 +111,7 @@ const init: SampleInit = async ({ canvas, pageState }) => {
 
     const passEncoder = commandEncoder.beginRenderPass(renderPassDescriptor);
     passEncoder.setPipeline(pipeline);
-    passEncoder.draw(3, 1, 0, 0);
+    passEncoder.draw(3);
     passEncoder.end();
 
     device.queue.submit([commandEncoder.finish()]);

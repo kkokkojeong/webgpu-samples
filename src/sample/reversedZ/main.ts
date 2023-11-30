@@ -72,7 +72,7 @@ const init: SampleInit = async ({ canvas, pageState, gui }) => {
 
   const context = canvas.getContext('webgpu') as GPUCanvasContext;
 
-  const devicePixelRatio = window.devicePixelRatio || 1;
+  const devicePixelRatio = window.devicePixelRatio;
   canvas.width = canvas.clientWidth * devicePixelRatio;
   canvas.height = canvas.clientHeight * devicePixelRatio;
   const presentationFormat = navigator.gpu.getPreferredCanvasFormat();
@@ -683,7 +683,7 @@ const init: SampleInit = async ({ canvas, pageState, gui }) => {
             0,
             1
           );
-          depthTextureQuadPass.draw(6, 1, 0, 0);
+          depthTextureQuadPass.draw(6);
           depthTextureQuadPass.end();
         }
       }
